@@ -7,26 +7,24 @@ import io
 import html
 import time
 import matplotlib.pyplot as plt
+
 #%matplotlib inline
 #!git clone https://github.com/AlexeyAB/darknet
 #%cd darknet
-
-
-###
 # !sed -i 's/OPENCV=0/OPENCV=1/' Makefile
 # !sed -i 's/GPU=0/GPU=1/' Makefile
 # !sed -i 's/CUDNN=0/CUDNN=1/' Makefile
 # !sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
 # !sed -i 's/LIBSO=0/LIBSO=1/' Makefile
 
-# !make
+##### !make
 
-# !wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq" -O yolov4-csp.weights && rm -rf /tmp/cookies.txt
+#!wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq" -O yolov4-csp.weights && rm -rf /tmp/cookies.txt
 
 
+#DARKNET PARA PYTHON--------------------------------------------------
+from darknet.darknet import *
 
-#DARKNET PARA PYTHON----------------
-from darknet import *
 network, class_names, class_colors = load_network("cfg/yolov4-csp.cfg", "cfg/coco.data", "yolov4-csp.weights")
 width = network_width(network)
 height = network_height(network)
@@ -74,7 +72,20 @@ def bbox_to_bytes(bbox_array):
   return bbox_bytes
 
 #FUNCION PARA EL VIDEOSTREAM-------------------------------------------------------
+vid = cv2.VideoCapture(0)
 
+while True:
+    
+    ret, frame = vid.read()
+
+    if ret == True:
+        cv2.imshow("hola", frame)
+        key = cv2.waitKey(1)
+        if key == ord("q"):
+            break
+  
+vid.release()
+cv2.destroyAllWindows()
 
 #CORRER POR WEBCAM
 video_stream()

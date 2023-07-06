@@ -3,13 +3,13 @@ import requests
 API_URL = "http://10.4.4.225:5000/IA" #poner la ip de ambar
 
 datosVagon = {
-    "personas" : "rojo",
+    "personas" : "red",
     "idVagon" : 5,
     "idTren" : 1
 }
 
 datosVagon1 = {
-    "personas" : "amarillo",
+    "personas" : "yellow",
     "idVagon" : 3,
     "idTren" : 1
 }
