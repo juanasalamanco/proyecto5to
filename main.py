@@ -7,20 +7,17 @@ import io
 import html
 import time
 import matplotlib.pyplot as plt
+import requests
 
-#%matplotlib inline
-#!git clone https://github.com/AlexeyAB/darknet
+from enviarDatos import *
+from contarPers import *
+from capture import *
+from funcionesImagenes import *
+
 #%cd darknet
-# !sed -i 's/OPENCV=0/OPENCV=1/' Makefile
-# !sed -i 's/GPU=0/GPU=1/' Makefile
-# !sed -i 's/CUDNN=0/CUDNN=1/' Makefile
-# !sed -i 's/CUDNN_HALF=0/CUDNN_HALF=1/' Makefile
-# !sed -i 's/LIBSO=0/LIBSO=1/' Makefile
 
 ##### !make
-
-#!wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1V3vsIaxAlGWvK4Aar9bAiK5U0QFttKwq" -O yolov4-csp.weights && rm -rf /tmp/cookies.txt
-
+#TENGO QUE HACER EL MAKE PARA QUE COMPILE
 
 #DARKNET PARA PYTHON--------------------------------------------------
 from darknet.darknet import *
@@ -43,83 +40,34 @@ def darknet_helper(img, width, height):
   free_image(darknet_image)
   return detections, width_ratio, height_ratio
 
-#FUNCIONES PARA CONVERTIR ENTRE DIFERENTES TIPOS DE IMAGENES------------------
-def js_to_image(js_reply):
-  """
-  Params:
-          js_reply: JavaScript object containing image from webcam
-  Returns:
-          img: OpenCV BGR image
-  """
-  image_bytes = b64decode(js_reply.split(',')[1])
-  jpg_as_np = np.frombuffer(image_bytes, dtype=np.uint8)
-  img = cv2.imdecode(jpg_as_np, flags=1)
 
-  return img
+#LO QUE LE VOY A MANDAR A AMBAR
+datosVagon = {
+    "personas" : "",
+    "idVagon" : 5,
+    "idTren" : 1
+}
 
-def bbox_to_bytes(bbox_array):
-  """
-  Params:
-          bbox_array: Numpy array (pixels) containing rectangle to overlay on video stream.
-  Returns:
-        bytes: Base64 image byte string
-  """
-  bbox_PIL = PIL.Image.fromarray(bbox_array, 'RGBA')
-  iobuf = io.BytesIO()
-  bbox_PIL.save(iobuf, format='png')
-  bbox_bytes = 'data:image/png;base64,{}'.format((str(b64encode(iobuf.getvalue()), 'utf-8')))
+#FUNCION QUE CORRE CADA CIERTO TIEMPO
+def correrCada1min():
 
-  return bbox_bytes
-
-#FUNCION PARA EL VIDEOSTREAM-------------------------------------------------------
-vid = cv2.VideoCapture(0)
-
-while True:
-    
+  vid = cv2.VideoCapture(0)
+  while True:
     ret, frame = vid.read()
-
     if ret == True:
-        cv2.imshow("hola", frame)
-        key = cv2.waitKey(1)
-        if key == ord("q"):
-            break
-  
-vid.release()
-cv2.destroyAllWindows()
-
-#CORRER POR WEBCAM
-video_stream()
-label_html = 'Capturing...'
-bbox = ''
-count = 0 
-while True:
-    js_reply = video_frame(label_html, bbox)
-    if not js_reply:
+      cv2.imshow("capturando...", frame)
+      key = cv2.waitKey(1)
+      
+      print("holaaAA")
+      
+      if key == ord("q"):
         break
 
-    frame = js_to_image(js_reply["img"])
+  vid.release()
+  cv2.destroyAllWindows()
 
-    bbox_array = np.zeros([480,640,4], dtype=np.uint8)
+  time.sleep(60)
 
-    detections, width_ratio, height_ratio = darknet_helper(frame, width, height)
+  return 
 
-    for label, confidence, bbox in detections:
-      left, top, right, bottom = bbox2points(bbox)
-      left, top, right, bottom = int(left * width_ratio), int(top * height_ratio), int(right * width_ratio), int(bottom * height_ratio)
-      bbox_array = cv2.rectangle(bbox_array, (left, top), (right, bottom), class_colors[label], 2)
-      bbox_array = cv2.putText(bbox_array, "{} [{:.2f}]".format(label, float(confidence)),
-                        (left, top - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                        class_colors[label], 2)
-
-    bbox_array[:,:,3] = (bbox_array.max(axis = 2) > 0 ).astype(int) * 255
-    bbox_bytes = bbox_to_bytes(bbox_array)
-    bbox = bbox_bytes
-
-    #PARA CONTAR LAS DETECCIONES
-    print(len(detections))
-    if len(detections) <= 50:
-      print("green")
-    elif len(detections) >= 50 and len(detections) <= 100:
-      print("yellow")
-    elif len(detections) >= 100 and len(detections) <= 169:
-      print("red")
+correrCada1min()
