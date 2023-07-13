@@ -20,25 +20,25 @@ from funcionesImagenes import *
 #TENGO QUE HACER EL MAKE PARA QUE COMPILE
 
 #DARKNET PARA PYTHON--------------------------------------------------
-from darknet.darknet import *
+# from darknet.darknet import *
 
-network, class_names, class_colors = load_network("cfg/yolov4-csp.cfg", "cfg/coco.data", "yolov4-csp.weights")
-width = network_width(network)
-height = network_height(network)
+# network, class_names, class_colors = load_network("cfg/yolov4-csp.cfg", "cfg/coco.data", "yolov4-csp.weights")
+# width = network_width(network)
+# height = network_height(network)
 
-def darknet_helper(img, width, height):
-  darknet_image = make_image(width, height, 3)
-  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  img_resized = cv2.resize(img_rgb, (width, height), interpolation=cv2.INTER_LINEAR)
+# def darknet_helper(img, width, height):
+#   darknet_image = make_image(width, height, 3)
+#   img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+#   img_resized = cv2.resize(img_rgb, (width, height), interpolation=cv2.INTER_LINEAR)
 
-  img_height, img_width, _ = img.shape
-  width_ratio = img_width/width
-  height_ratio = img_height/height
+#   img_height, img_width, _ = img.shape
+#   width_ratio = img_width/width
+#   height_ratio = img_height/height
 
-  copy_image_from_bytes(darknet_image, img_resized.tobytes())
-  detections = detect_image(network, class_names, darknet_image)
-  free_image(darknet_image)
-  return detections, width_ratio, height_ratio
+#   copy_image_from_bytes(darknet_image, img_resized.tobytes())
+#   detections = detect_image(network, class_names, darknet_image)
+#   free_image(darknet_image)
+#   return detections, width_ratio, height_ratio
 
 
 #LO QUE LE VOY A MANDAR A AMBAR
@@ -52,21 +52,20 @@ datosVagon = {
 def correrCada1min():
 
   vid = cv2.VideoCapture(0)
-  while True:
+  while(True):
+    print("hola")
     ret, frame = vid.read()
-    if ret == True:
-      cv2.imshow("capturando...", frame)
-      key = cv2.waitKey(1)
-      
-      print("holaaAA")
-      
-      if key == ord("q"):
-        break
-
+    cv2.imshow('frame', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+      break
   vid.release()
   cv2.destroyAllWindows()
 
-  time.sleep(60)
+  #contarPersonas(detections, datosVagon)
+  #mandarDatos(datosVagon)
+
+  time.sleep(10)
+  correrCada1min()
 
   return 
 
