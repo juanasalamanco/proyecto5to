@@ -14,9 +14,9 @@ from contarPers import *
 from capture import *
 from funcionesImagenes import *
 
-#%cd darknet
+#cd darknet
 
-##### !make
+#make
 #TENGO QUE HACER EL MAKE PARA QUE COMPILE
 
 #DARKNET PARA PYTHON--------------------------------------------------
@@ -48,25 +48,29 @@ datosVagon = {
     "idTren" : 1
 }
 
-#FUNCION QUE CORRE CADA CIERTO TIEMPO
+#TENGO QUE HACER QUE SE CORRA CADA TRES MINUTOS LA FUNCION
 def correrCada1min():
+  cap = cv2.VideoCapture(1)
+  if (cap.isOpened()== False):
+      print("Error opening video file")
+    
+  while(cap.isOpened()):
+      ret, frame = cap.read()
+      #contarPersonas(detections, datosVagon)
+      mandarDatos(datosVagon)
+      if ret == True:
+          cv2.imshow('Frame', frame)
+          if cv2.waitKey(25) & 0xFF == ord('q'):
+              break
+      else:
+          break
 
-  vid = cv2.VideoCapture(0)
-  while(True):
-    print("hola")
-    ret, frame = vid.read()
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-      break
-  vid.release()
+  cap.release()
   cv2.destroyAllWindows()
-
+  
   #contarPersonas(detections, datosVagon)
-  mandarDatos(datosVagon)
-
-  time.sleep(10)
-  correrCada1min()
-
-  return 
+  #mandarDatos(datosVagon)
+  
+  return
 
 correrCada1min()
